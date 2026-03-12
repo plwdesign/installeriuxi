@@ -234,6 +234,10 @@ EOF
   git config --global --add safe.directory "/home/deploy/${empresa_atualizar}" || true
 
   if [ -d ".git" ]; then
+    # Descarta quaisquer alterações locais e arquivos não rastreados
+    git reset --hard HEAD
+    git clean -fd
+
     # Atualiza usando o mesmo padrão do script externo:
     # git pull https://usuario:senha@github.com/iuxicrm/iuxi.git
     git pull "https://${github_username}:${github_token}@github.com/iuxicrm/iuxi.git"
