@@ -135,11 +135,22 @@ backup_instance() {
 
   BACKUP_NAME="${empresa_atualizar}-\${TIMESTAMP}.zip"
 
+  # Backup apenas do código e configs, ignorando pastas de build/cache
+  # (node_modules, dist, build, public de frontend/backend)
+  EXCLUDES=(
+    "${empresa_atualizar}/node_modules/*"
+    "${empresa_atualizar}/frontend/node_modules/*"
+    "${empresa_atualizar}/frontend/build/*"
+    "${empresa_atualizar}/frontend/public/*"
+    "${empresa_atualizar}/backend/node_modules/*"
+    "${empresa_atualizar}/backend/dist/*"
+  )
+
   if [ -f "\$DB_DUMP" ]; then
-    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" "\$DB_DUMP"
+    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" "\$DB_DUMP" -x "\${EXCLUDES[@]}"
     rm -f "\$DB_DUMP"
   else
-    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}"
+    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" -x "\${EXCLUDES[@]}"
   fi
 EOF
 
@@ -201,6 +212,7 @@ update_instance_from_github() {
   # Atualiza backend
   if [ -d "/home/deploy/${empresa_atualizar}/backend" ]; then
     cd /home/deploy/${empresa_atualizar}/backend
+    rm -rf node_modules dist package-lock.json
     npm install
     npm run build
     npx sequelize db:migrate
@@ -209,6 +221,7 @@ update_instance_from_github() {
   # Atualiza frontend
   if [ -d "/home/deploy/${empresa_atualizar}/frontend" ]; then
     cd /home/deploy/${empresa_atualizar}/frontend
+    rm -rf node_modules build package-lock.json
     npm install
     npm run build
   fi
