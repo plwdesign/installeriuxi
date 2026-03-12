@@ -234,6 +234,15 @@ EOF
   git config --global --add safe.directory "/home/deploy/${empresa_atualizar}" || true
 
   if [ -d ".git" ]; then
+    # Garante que a URL remota NÃO tenha mais usuario:token@ embutido
+    current_url=\$(git remote get-url origin 2>/dev/null || echo "")
+    if [ -n "\$current_url" ]; then
+      clean_url=\$(echo "\$current_url" | sed -E "s#https://[^/@]+:[^/@]+@#https://#")
+      if [ "\$clean_url" != "\$current_url" ]; then
+        git remote set-url origin "\$clean_url" || true
+      fi
+    fi
+
     # Usa header Authorization em vez de alterar a URL com usuário:token
     auth_header=\$(printf "Authorization: Basic %s" "\$(printf "%s:%s" "${github_username}" "${github_token}" | base64)")
     git -c http.extraHeader="\$auth_header" pull
