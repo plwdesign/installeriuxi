@@ -222,6 +222,9 @@ EOF
 
   cd /home/deploy/${empresa_atualizar}
 
+  # Evita erro de "dubious ownership" do Git
+  git config --global --add safe.directory "/home/deploy/${empresa_atualizar}" || true
+
   if [ -d ".git" ]; then
     current_remote=\$(git remote get-url origin 2>/dev/null || echo "")
     if [ -n "\$current_remote" ] && [[ "\$current_remote" == https://*github.com* ]]; then
