@@ -226,12 +226,9 @@ EOF
   git config --global --add safe.directory "/home/deploy/${empresa_atualizar}" || true
 
   if [ -d ".git" ]; then
-    current_remote=\$(git remote get-url origin 2>/dev/null || echo "")
-    if [ -n "\$current_remote" ] && [[ "\$current_remote" == https://*github.com* ]]; then
-      new_remote=\$(echo "\$current_remote" | sed -E "s#https://#https://${github_username}:${github_token}@#")
-      git remote set-url origin "\$new_remote"
-    fi
-    git pull
+    # Usa header Authorization em vez de alterar a URL com usuário:token
+    auth_header=\$(printf "Authorization: Basic %s" "\$(printf "%s:%s" "${github_username}" "${github_token}" | base64)")
+    git -c http.extraHeader="\$auth_header" pull
   else
     echo "A instância /home/deploy/${empresa_atualizar} não é um repositório git. Atualização abortada."
     exit 1
