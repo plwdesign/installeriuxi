@@ -45,15 +45,23 @@ system_git_clone() {
 
   sleep 2
 
-  # Solicita username e token
+  # Solicita username e token (para repositórios privados)
   read -p "Digite seu GitHub username: " github_username
   read -s -p "Digite seu GitHub token: " github_token
   echo ""
 
-  # Constrói link com autenticação
+  # Para GitHub, evita colocar username:token na URL
+  # e usa header Authorization, como no update_instance_from_github
   if [[ $link_git == *"github.com"* ]]; then
-    repo_url=$(echo "$link_git" | sed -E "s#https://#https://${github_username}:${github_token}@#")
-    sudo -u deploy git clone "$repo_url" /home/deploy/${instancia_add}/
+    sudo -u deploy bash -lc '
+      set -u
+      link_git_inner="'"$link_git"'"
+      github_username_inner="'"$github_username"'"
+      github_token_inner="'"$github_token"'"
+
+      auth_header=$(printf "Authorization: Basic %s" "$(printf "%s:%s" "$github_username_inner" "$github_token_inner" | base64)")
+      git -c http.extraHeader="$auth_header" clone "$link_git_inner" "/home/deploy/'"${instancia_add}"'/"
+    '
   else
     sudo -u deploy git clone "$link_git" /home/deploy/${instancia_add}/
   fi
