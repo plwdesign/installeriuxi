@@ -137,20 +137,23 @@ backup_instance() {
 
   # Backup apenas do código e configs, ignorando pastas de build/cache
   # (node_modules, dist, build, public de frontend/backend)
-  EXCLUDES=(
-    "${empresa_atualizar}/node_modules/*"
-    "${empresa_atualizar}/frontend/node_modules/*"
-    "${empresa_atualizar}/frontend/build/*"
-    "${empresa_atualizar}/frontend/public/*"
-    "${empresa_atualizar}/backend/node_modules/*"
-    "${empresa_atualizar}/backend/dist/*"
-  )
-
   if [ -f "\$DB_DUMP" ]; then
-    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" "\$DB_DUMP" -x "\${EXCLUDES[@]}"
+    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" "\$DB_DUMP" \
+      -x "${empresa_atualizar}/node_modules/*" \
+         "${empresa_atualizar}/frontend/node_modules/*" \
+         "${empresa_atualizar}/frontend/build/*" \
+         "${empresa_atualizar}/frontend/public/*" \
+         "${empresa_atualizar}/backend/node_modules/*" \
+         "${empresa_atualizar}/backend/dist/*"
     rm -f "\$DB_DUMP"
   else
-    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" -x "\${EXCLUDES[@]}"
+    zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" \
+      -x "${empresa_atualizar}/node_modules/*" \
+         "${empresa_atualizar}/frontend/node_modules/*" \
+         "${empresa_atualizar}/frontend/build/*" \
+         "${empresa_atualizar}/frontend/public/*" \
+         "${empresa_atualizar}/backend/node_modules/*" \
+         "${empresa_atualizar}/backend/dist/*"
   fi
 EOF
 
