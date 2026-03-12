@@ -192,6 +192,26 @@ update_instance_from_github() {
 
   sleep 1
 
+  # Limpeza forçada de node_modules, dist/build e package-lock.json como root
+  sudo su - root <<EOF
+  set -u
+
+  BACKEND_DIR="/home/deploy/${empresa_atualizar}/backend"
+  FRONTEND_DIR="/home/deploy/${empresa_atualizar}/frontend"
+
+  if [ -d "\$BACKEND_DIR" ]; then
+    rm -rf "\$BACKEND_DIR/node_modules" "\$BACKEND_DIR/dist" "\$BACKEND_DIR/package-lock.json"
+    chown -R deploy:deploy "\$BACKEND_DIR" || true
+  fi
+
+  if [ -d "\$FRONTEND_DIR" ]; then
+    rm -rf "\$FRONTEND_DIR/node_modules" "\$FRONTEND_DIR/build" "\$FRONTEND_DIR/package-lock.json"
+    chown -R deploy:deploy "\$FRONTEND_DIR" || true
+  fi
+EOF
+
+  sleep 1
+
   sudo su - deploy <<EOF
   set -u
 
@@ -217,7 +237,6 @@ update_instance_from_github() {
   # Atualiza backend
   if [ -d "/home/deploy/${empresa_atualizar}/backend" ]; then
     cd /home/deploy/${empresa_atualizar}/backend
-    rm -rf node_modules dist package-lock.json
     npm install
     npm run build
     npx sequelize db:migrate
@@ -226,7 +245,6 @@ update_instance_from_github() {
   # Atualiza frontend
   if [ -d "/home/deploy/${empresa_atualizar}/frontend" ]; then
     cd /home/deploy/${empresa_atualizar}/frontend
-    rm -rf node_modules build package-lock.json
     npm install
     npm run build
   fi
