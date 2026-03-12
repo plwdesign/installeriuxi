@@ -193,9 +193,9 @@ update_instance_from_github() {
   # Como o repositório é privado, usamos usuário padrão iuxicrm
   github_username="iuxicrm"
 
-  printf "${YELLOW} 💻 Informe o token de acesso do GitHub para o usuário ${github_username}:${GRAY_LIGHT}\n"
+  printf "${YELLOW} 💻 Digite a senha do GitHub para o usuário ${github_username} (a senha ficará invisível):${GRAY_LIGHT}\n"
   printf "\n"
-  read -s -p "Token: " github_token
+  read -s github_token
   echo ""
 
   sleep 1
