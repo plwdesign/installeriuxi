@@ -135,7 +135,7 @@ backup_instance() {
 
   BACKUP_NAME="${empresa_atualizar}-\${TIMESTAMP}.zip"
 
-  # Backup apenas do código e configs, ignorando pastas de build/cache
+  # Backup apenas do código e configs, ignorando pastas de build/cache e arquivos públicos
   # (node_modules, dist, build, public de frontend/backend)
   if [ -f "\$DB_DUMP" ]; then
     zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" "\$DB_DUMP" \
@@ -144,7 +144,8 @@ backup_instance() {
          "${empresa_atualizar}/frontend/build/*" \
          "${empresa_atualizar}/frontend/public/*" \
          "${empresa_atualizar}/backend/node_modules/*" \
-         "${empresa_atualizar}/backend/dist/*"
+         "${empresa_atualizar}/backend/dist/*" \
+         "${empresa_atualizar}/backend/public/*"
     rm -f "\$DB_DUMP"
   else
     zip -r "\$BACKUP_BASE_DIR/\$BACKUP_NAME" "${empresa_atualizar}" \
@@ -153,7 +154,8 @@ backup_instance() {
          "${empresa_atualizar}/frontend/build/*" \
          "${empresa_atualizar}/frontend/public/*" \
          "${empresa_atualizar}/backend/node_modules/*" \
-         "${empresa_atualizar}/backend/dist/*"
+         "${empresa_atualizar}/backend/dist/*" \
+         "${empresa_atualizar}/backend/public/*"
   fi
 EOF
 
