@@ -234,18 +234,9 @@ EOF
   git config --global --add safe.directory "/home/deploy/${empresa_atualizar}" || true
 
   if [ -d ".git" ]; then
-    # Garante que a URL remota NÃO tenha mais usuario:token@ embutido
-    current_url=\$(git remote get-url origin 2>/dev/null || echo "")
-    if [ -n "\$current_url" ]; then
-      clean_url=\$(echo "\$current_url" | sed -E "s#https://[^/@]+:[^/@]+@#https://#")
-      if [ "\$clean_url" != "\$current_url" ]; then
-        git remote set-url origin "\$clean_url" || true
-      fi
-    fi
-
-    # Usa header Authorization em vez de alterar a URL com usuário:token
-    auth_header=\$(printf "Authorization: Basic %s" "\$(printf "%s:%s" "${github_username}" "${github_token}" | base64)")
-    git -c http.extraHeader="\$auth_header" pull
+    # Atualiza usando o mesmo padrão do script externo:
+    # git pull https://usuario:senha@github.com/iuxicrm/iuxi.git
+    git pull "https://${github_username}:${github_token}@github.com/iuxicrm/iuxi.git"
   else
     echo "A instância /home/deploy/${empresa_atualizar} não é um repositório git. Atualização abortada."
     exit 1
